@@ -7,17 +7,18 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 public class AppTest {
 
     /*
-        Tout les exercices ici sont possibles en une seule ligne de code sauf pour l'exercice de l'arbre binaire.
-        Pour l'arbre binaire, vous pouvez vous aidez de l'image dans le readme
-        Il faut modifier uniquement cette classe, et ne pas modifier les assertions.
-    */
+     * Tout les exercices ici sont possibles en une seule ligne de code sauf pour
+     * l'exercice de l'arbre binaire.
+     * Pour l'arbre binaire, vous pouvez vous aidez de l'image dans le readme
+     * Il faut modifier uniquement cette classe, et ne pas modifier les assertions.
+     */
     @Test
     public void testApp() {
 
@@ -46,23 +47,31 @@ public class AppTest {
                 .addY(320)
                 .build();
 
-
         // Calculer l'aire pour les carrés et les triangles
         // et afficher le résultat pour chaque instance (System.out.println(**))
+        List<Integer> areas = List.of(square1, square2, square3, triangle1, triangle2)
+                .stream()
+                .peek(p -> System.out.println(p.areaCalc()))
+                .map(p -> p.areaCalc())
+                .toList();
 
-        
         // Ici je voudrais filtrer les éléments qui ont une aire > 250
         // Puis récupérer le nombre d'élément avec une aire > 250
 
-        Assertions.assertEquals(3, 3);
+        long count = areas.stream().filter(a -> a > 250).count();
+
+        Assertions.assertEquals(3, count);
     }
 
     @Test
     public void find_pair_and_impair_number() {
         List<Integer> numbers = List.of(1, 2, 3, 4, 5, 6, 7);
 
-        // J'attend une map de Boolean, false pour les nombres impaires, et true pour les nombres pairs
+        // J'attend une map de Boolean, false pour les nombres impaires, et true pour
+        // les nombres pairs
+
         Map<Boolean, List<Integer>> partitionedNumbers = new HashMap<>();
+        partitionedNumbers = numbers.stream().collect(java.util.stream.Collectors.partitioningBy(n -> n % 2 == 0));
 
         Assertions.assertEquals(4, partitionedNumbers.get(false).size());
         Assertions.assertEquals(3, partitionedNumbers.get(true).size());
@@ -73,7 +82,8 @@ public class AppTest {
         final String strElement = "pas";
         final String text = "Je crois avoir passé le chemin, mais je ne suis pas sûr";
 
-        // Ici je voudrais vérifier combien de fois il y a le mot "pas", et uniquement le mot "pas"
+        // Ici je voudrais vérifier combien de fois il y a le mot "pas", et uniquement
+        // le mot "pas"
         Assertions.assertEquals(1, findOccurrenceElement(strElement, text));
     }
 
@@ -85,12 +95,12 @@ public class AppTest {
                 BigInteger.valueOf(5),
                 BigInteger.valueOf(10),
                 BigInteger.valueOf(3),
-                BigInteger.valueOf(7)
-        );
+                BigInteger.valueOf(7));
 
         Node root = new Node(BigInteger.ONE);
 
-        // Je voudrais un code récursif qui construit mon arbre binaire. sachant que le noeud 1 est le noeud root.
+        // Je voudrais un code récursif qui construit mon arbre binaire. sachant que le
+        // noeud 1 est le noeud root.
         buildTree(root, numbers);
 
         Assertions.assertEquals(BigInteger.valueOf(2), root.getLeft().getValue());
@@ -98,12 +108,45 @@ public class AppTest {
     }
 
     private static Node buildTree(Node node, List<BigInteger> numbers) {
-        return new Node();
+        List<Node> currentLevel = new ArrayList<>();
+        currentLevel.add(node);
+        buildTreeRecursive(currentLevel, numbers, 0);
+        return node;
+    }
+
+    private static int buildTreeRecursive(List<Node> currentLevel, List<BigInteger> numbers, int index) {
+        if (index >= numbers.size() || currentLevel.isEmpty()) {
+            return index;
+        }
+
+        List<Node> nextLevel = new ArrayList<>();
+
+        for (Node node : currentLevel) {
+            if (index < numbers.size()) {
+                node.setLeft(new Node(numbers.get(index++)));
+                nextLevel.add(node.getLeft());
+            }
+
+            if (index < numbers.size()) {
+                node.setRight(new Node(numbers.get(index++)));
+                nextLevel.add(node.getRight());
+            }
+        }
+
+        return buildTreeRecursive(nextLevel, numbers, index);
     }
 
     private static int findOccurrenceElement(final String strElement, final String text) {
-        return 0;
+        return (int) java.util.regex.Pattern.compile("\\b" + strElement + "\\b")
+                .matcher(text)
+                .results()
+                .count();
     }
 
-
 }
+
+
+// temps total sur le test 42 min 
+//-5 min comprendre les class 
+//-10 min exercice 1 & 2 & 3
+// reste du temps ecercice 4 en respectant tout les critaire 
